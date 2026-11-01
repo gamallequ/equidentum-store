@@ -94,6 +94,13 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
     .update(cartId, data, {}, await getAuthHeaders())
     .then(async ({ cart }) => {
       await revalidateCacheTag("carts")
+      // Shipping options are matched against the cart's address and priced
+      // against its total, and checkout fetches them before the address is
+      // set. Without this the delivery step keeps serving that first, empty
+      // list, so no option can be picked and "Continue to payment" never
+      // enables. Upstream purges its "fulfillment" tag here for the same
+      // reason; this repo calls that tag "shipping". See fulfillment.ts.
+      await revalidateCacheTag("shipping")
       return cart
     })
     .catch(medusaError)
@@ -264,13 +271,10 @@ export async function applyPromotions(codes: string[]) {
     throw new Error("No existing cart found")
   }
 
-  await updateCart({ promo_codes: codes }).catch(medusaError)
-
   // A discount moves the cart total, and shipping options can be priced
-  // against it, so the options have to be refetched too. Upstream does the
-  // same thing here under its "fulfillment" tag; this repo calls that tag
-  // "shipping". See lib/data/fulfillment.ts.
-  await revalidateCacheTag("shipping")
+  // against it. updateCart purges the "shipping" tag, so the options are
+  // refetched without a separate call here.
+  await updateCart({ promo_codes: codes }).catch(medusaError)
 }
 
 export async function applyGiftCard(code: string) {
