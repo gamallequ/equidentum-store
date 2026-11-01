@@ -21,7 +21,7 @@ export interface InviteUserEmailProps {
   preview?: string
   /**
    * The name of the store the user is being invited to. Defaults to the
-   * STORE_NAME environment variable, or "your store" when unset.
+   * STORE_NAME environment variable, or "Equidentum" when unset.
    */
   storeName?: string
 }
@@ -38,8 +38,8 @@ export const isInviteUserData = (data: any): data is InviteUserEmailProps =>
  */
 export const InviteUserEmail = ({
   inviteLink,
-  storeName = process.env.STORE_NAME || 'your store',
-  preview = `You've been invited to join ${process.env.STORE_NAME || 'your store'} as an administrator`,
+  storeName = process.env.STORE_NAME || 'Equidentum',
+  preview = `You've been invited to join ${process.env.STORE_NAME || 'Equidentum'} as an administrator`,
 }: InviteUserEmailProps) => {
   return (
     <Base preview={preview}>

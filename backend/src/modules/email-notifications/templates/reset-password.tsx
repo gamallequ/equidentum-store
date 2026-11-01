@@ -36,7 +36,7 @@ export interface ResetPasswordEmailProps {
   preview?: string
   /**
    * The name of the store. Defaults to the STORE_NAME environment variable,
-   * or "your store" when unset.
+   * or "Equidentum" when unset.
    */
   storeName?: string
 }
@@ -56,7 +56,7 @@ export const ResetPasswordEmail = ({
   email,
   isAdmin = false,
   expiresInMinutes = 15,
-  storeName = process.env.STORE_NAME || 'your store',
+  storeName = process.env.STORE_NAME || 'Equidentum',
   preview = 'Reset your password',
 }: ResetPasswordEmailProps) => {
   const account = isAdmin
