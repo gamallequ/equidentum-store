@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
+import { transferCart } from "./cart"
 import { HttpTypes } from "@medusajs/types"
 import { redirect } from "next/navigation"
 import { cache } from "react"
@@ -157,6 +158,7 @@ export async function signup(
     }
 
     await setAuthToken(loginToken)
+    await transferCart(loginToken)
     await revalidateCacheTag("customers")
     return { success: true, error: null }
   } catch (error: any) {
@@ -179,6 +181,7 @@ export async function login(
     }
 
     await setAuthToken(token)
+    await transferCart(token)
     await revalidateCacheTag("customers")
     return { success: true, error: null }
   } catch (error: any) {
