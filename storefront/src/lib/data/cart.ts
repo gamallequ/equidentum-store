@@ -79,6 +79,7 @@ export async function getOrSetCart(countryCode: string) {
       await getAuthHeaders()
     )
     await revalidateCacheTag("carts")
+    await revalidateCacheTag("shipping")
   }
 
   return cart
@@ -136,6 +137,7 @@ export async function addToCart({
     )
     .then(async () => {
       await revalidateCacheTag("carts")
+      await revalidateCacheTag("shipping")
     })
     .catch(medusaError)
 }
@@ -160,6 +162,7 @@ export async function updateLineItem({
     .updateLineItem(cartId, lineId, { quantity }, {}, await getAuthHeaders())
     .then(async () => {
       await revalidateCacheTag("carts")
+      await revalidateCacheTag("shipping")
     })
     .catch(medusaError)
 }
@@ -178,6 +181,7 @@ export async function deleteLineItem(lineId: string) {
     .deleteLineItem(cartId, lineId, {}, await getAuthHeaders())
     .then(async () => {
       await revalidateCacheTag("carts")
+      await revalidateCacheTag("shipping")
     })
     .catch(medusaError)
 }
