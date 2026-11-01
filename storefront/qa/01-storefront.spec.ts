@@ -98,7 +98,7 @@ test.describe("Storefront shell", () => {
     const hero = page.getByTestId("hero")
     await expect(hero).toBeVisible()
     await expect(
-      hero.getByRole("heading", { level: 1, name: /every ride/i })
+      hero.getByRole("heading", { level: 1, name: /beyond the ordinary/i })
     ).toBeVisible()
 
     // A storefront homepage should have exactly one h1, and it should not be a
@@ -110,10 +110,10 @@ test.describe("Storefront shell", () => {
     await expect(page.getByTestId("store-page-title")).toBeVisible()
   })
 
-  test("the hero product photos load", async ({ page }) => {
+  test("the hero photograph loads", async ({ page }) => {
     await page.goto(url())
 
-    // A hero with a broken product shot is worse than no shot at all.
+    // A hero with a broken photograph is worse than no photograph at all.
     const images = page.getByTestId("hero").locator("img")
     for (const img of await images.all()) {
       if (!(await img.isVisible())) continue

@@ -66,12 +66,6 @@ const nextConfig = {
         protocol: "https",
         hostname: "img.youtube.com",
       },
-      { // Note: placeholder Decathlon photos on the horse accessories landing
-        // page. Can be removed once src/modules/horse-accessories/data.ts uses
-        // your own product media.
-        protocol: "https",
-        hostname: "cdn.shopify.com",
-      },
       { // Note: can be removed after deleting demo products
         protocol: "https",
         hostname: "medusa-public-images.s3.eu-west-1.amazonaws.com",
