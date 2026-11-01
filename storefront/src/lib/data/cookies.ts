@@ -54,8 +54,19 @@ export const getCacheTag = async (tag: string): Promise<string> => {
  * that visitor's own session could name their tag. The shared tag is what the
  * backend's catalog-changed subscriber purges through /api/revalidate, and
  * the TTL bounds staleness when that call is not configured or fails.
+ *
+ * Shipping options are in the list for the same reason. The cart writes in
+ * cart.ts purge the visitor's own list, but an admin editing an option or its
+ * price could not reach anyone else's, so shoppers kept seeing the old option
+ * until they next changed their cart.
  */
-export const CATALOG_TAGS = ["products", "categories", "collections", "regions"]
+export const CATALOG_TAGS = [
+  "products",
+  "categories",
+  "collections",
+  "regions",
+  "shipping",
+]
 export const CATALOG_REVALIDATE_SECONDS = 60
 
 export const getCacheDirectives = async (
