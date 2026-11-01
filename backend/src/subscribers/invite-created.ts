@@ -27,7 +27,7 @@ export default async function userInviteHandler({
           // fallback, so the reply-to was empty on every deploy configured
           // with RESEND_FROM, which is what the Railway template sets.
           replyTo: process.env.ORDER_REPLY_TO_EMAIL || RESEND_FROM_EMAIL,
-          subject: `You've been invited to ${process.env.STORE_NAME || 'your store'}!`
+          subject: `You've been invited to ${process.env.STORE_NAME || 'Equidentum'}!`
         },
         inviteLink: `${BACKEND_URL}/app/invite?token=${invite.token}`,
         preview: 'The administration dashboard awaits...'

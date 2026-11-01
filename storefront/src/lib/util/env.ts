@@ -25,12 +25,10 @@ export const getBaseURL = () => {
 
 /**
  * Your shop's own name, shown in the nav, footer, checkout header, page titles
- * and legal copy. Set NEXT_PUBLIC_STORE_NAME to your store's name. The fallback
- * is a placeholder on purpose, so an unconfigured deploy prompts you to set it
- * rather than shipping someone else's brand.
+ * and legal copy. Defaults to "Equidentum"; override with NEXT_PUBLIC_STORE_NAME.
  */
 export const getStoreName = () => {
-  return process.env.NEXT_PUBLIC_STORE_NAME || "Your Store"
+  return process.env.NEXT_PUBLIC_STORE_NAME || "Equidentum"
 }
 
 /**

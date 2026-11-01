@@ -47,7 +47,7 @@ export const qaEnv = {
   baseURL: read("QA_BASE_URL", read("NEXT_PUBLIC_BASE_URL", "http://localhost:8000")),
   backendURL: read("NEXT_PUBLIC_MEDUSA_BACKEND_URL", "http://localhost:9000"),
   /** Mirrors the storefront default in src/lib/util/env.ts. */
-  storeName: read("NEXT_PUBLIC_STORE_NAME", "Your Store"),
+  storeName: read("NEXT_PUBLIC_STORE_NAME", "Equidentum"),
   /** Must match a country covered by a region in Medusa. */
   region: read("NEXT_PUBLIC_DEFAULT_REGION", "gb").toLowerCase(),
   /** Medusa admin dashboard, served by the backend at /app. */

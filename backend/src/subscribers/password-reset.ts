@@ -87,7 +87,7 @@ export default async function passwordResetHandler({
       data: {
         emailOptions: {
           replyTo: process.env.ORDER_REPLY_TO_EMAIL || RESEND_FROM_EMAIL,
-          subject: `Reset your ${process.env.STORE_NAME || 'store'} password`,
+          subject: `Reset your ${process.env.STORE_NAME || 'Equidentum'} password`,
         },
         resetLink,
         email,
