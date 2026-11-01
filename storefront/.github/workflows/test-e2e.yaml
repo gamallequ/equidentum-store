@@ -1,4 +1,4 @@
-name: Medusa NextJS Template Tests
+name: Equidentum Storefront E2E Tests
 
 on:
   push:

@@ -1,8 +1,8 @@
 {
-  "name": "medusa-2.0-boilerplate-backend",
+  "name": "equidentum-store-backend",
   "version": "0.0.2",
-  "description": "A Prebaked Medusa 2.0 backend",
-  "author": "Rasmus Puls",
+  "description": "Equidentum Store backend (Medusa 2)",
+  "author": "Equidentum",
   "license": "MIT",
   "keywords": [
     "sqlite",

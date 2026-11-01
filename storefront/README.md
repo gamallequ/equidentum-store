@@ -3,11 +3,11 @@
 </h1>
 
 <p align="center">
-The Next.js storefront of this Railway deploy template, based on the official Medusa Next.js starter.<br>
+The Next.js storefront of the Equidentum Store.<br>
 For deployment instructions and the full stack overview, see the <a href="../README.md">main README</a>.</p>
 
 <p align="center">
-  <sub>An independent project, not affiliated with MedusaJS, Inc. For questions about Medusa itself, see the <a href="https://docs.medusajs.com/">official documentation</a>.</sub>
+  <sub>For questions about Medusa itself, see the <a href="https://docs.medusajs.com/">official documentation</a>.</sub>
 </p>
 
 ---
@@ -65,7 +65,7 @@ point.
 
 **PayPal is half-wired on purpose.** The button, icon and payment wrapper are
 all here, and `isPaypal()` matches a provider id starting with `pp_paypal`. But
-this template registers no PayPal provider on the backend, so no such payment
+the Equidentum backend registers no PayPal provider, so no such payment
 session is ever created and the button cannot render. Install and register a
 PayPal provider in `backend/medusa-config.js`, then set
 `NEXT_PUBLIC_PAYPAL_CLIENT_ID`. Nothing in the storefront needs changing.
