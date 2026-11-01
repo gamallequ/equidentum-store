@@ -3,17 +3,17 @@
 </h1>
 
 <p align="center">
-The Medusa 2.0 backend of this Railway deploy template.<br>
+The Medusa 2 backend of the Equidentum Store.<br>
 For deployment instructions and the full stack overview, see the <a href="../README.md">main README</a>.</p>
 
 <p align="center">
-  <sub>An independent project, not affiliated with MedusaJS, Inc. For questions about Medusa itself, see the <a href="https://docs.medusajs.com/">official documentation</a>.</sub>
+  <sub>For questions about Medusa itself, see the <a href="https://docs.medusajs.com/">official documentation</a>.</sub>
 </p>
 
 ---
 
 Medusa is used as published, with no fork and no patches to the core. Everything
-in `src/` is this template's own configuration and additions.
+in `src/` is the Equidentum Store's own configuration and additions.
 
 ## Running it
 
@@ -66,7 +66,7 @@ All four are provisioned automatically by the Railway template.
 
 The local `docker-compose.yml` in the repository root provides all four.
 
-## What this template adds
+## What the Equidentum Store adds
 
 | Path | What it is |
 | ---- | ---------- |

@@ -10,7 +10,7 @@ pnpm email:dev
 
 This will start a react-email server at `http://localhost:3002` where you can preview the email templates.
 
-## What this template sends
+## What the Equidentum Store sends
 
 | Template | Sent by | When |
 | -------- | ------- | ---- |
