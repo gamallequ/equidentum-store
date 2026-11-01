@@ -29,6 +29,12 @@ module.exports = {
           gold: "#c69d6d",
           ink: "#2a2a2a",
           slate: "#565656",
+          // Landing page palette: ivory pages, champagne accents, charcoal
+          // and leather for the darker, more cinematic sections.
+          ivory: "#F8F5F0",
+          champagne: "#D8C3A0",
+          charcoal: "#161316",
+          leather: "#7A4E2D",
         },
         grey: {
           0: "#FFFFFF",
@@ -79,6 +85,9 @@ module.exports = {
           "Ubuntu",
           "sans-serif",
         ],
+        // Editorial serif for landing page headlines, loaded with next/font in
+        // the (landing) layout and exposed as a CSS variable.
+        display: ["var(--font-display)", "Georgia", "Times New Roman", "serif"],
       },
       keyframes: {
         ring: {
