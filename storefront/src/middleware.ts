@@ -203,7 +203,10 @@ export const config = {
   //
   // .woff2 covers the self-hosted Almarai brand font in public/fonts, which
   // would otherwise be redirected to /<region>/fonts/... and 404.
+  //
+  // .webp and .avif cover the landing page photography in public/landing, which
+  // was redirected the same way and rendered every photo as a broken image.
   matcher: [
-    "/((?!api|_next/static|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.gif|.*\\.svg|.*\\.woff2).*)",
+    "/((?!api|_next/static|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.webp|.*\\.avif|.*\\.gif|.*\\.svg|.*\\.woff2).*)",
   ],
 }
