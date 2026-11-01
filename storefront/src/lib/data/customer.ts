@@ -40,69 +40,149 @@ export const updateCustomer = cache(async function (
   return updateRes
 })
 
-export async function signup(_currentState: unknown, formData: FormData) {
+export type AuthFormState = { success: boolean; error: string | null } | null
+
+const fail = (error: string): AuthFormState => ({ success: false, error })
+
+const emailpassLogin = async (email: string, password: string) => {
+  const token = await sdk.auth.login("customer", "emailpass", {
+    email,
+    password,
+  })
+
+  // emailpass always returns a token string. The other shapes in the union are
+  // OAuth redirect, MFA challenge and pending email verification, none of
+  // which this storefront implements.
+  return typeof token === "string" ? token : null
+}
+
+/**
+ * Registers a customer.
+ *
+ * Medusa splits this into two records: an auth identity (register) and the
+ * customer row the admin lists (customer.create). They are separate requests,
+ * so the second can fail after the first succeeded, leaving an identity with
+ * no customer. Every later attempt then failed with "Identity with email
+ * already exists" and the account could never be finished. When register
+ * reports the identity exists, this signs in with the submitted password and
+ * creates the missing customer row if there is none, which repairs those
+ * half-made accounts instead of locking them out.
+ *
+ * Returns a plain state object. It used to return the created customer, which
+ * the form handed to ErrorMessage, and rendering an object crashed the page on
+ * every successful signup.
+ */
+export async function signup(
+  _currentState: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const email = (formData.get("email") as string)?.trim()
   const password = formData.get("password") as string
-  const customerForm = {
-    email: formData.get("email") as string,
-    first_name: formData.get("first_name") as string,
-    last_name: formData.get("last_name") as string,
-    phone: formData.get("phone") as string,
+  const firstName = (formData.get("first_name") as string)?.trim()
+  const lastName = (formData.get("last_name") as string)?.trim()
+  const phone = (formData.get("phone") as string)?.trim()
+
+  if (!email || !password || !firstName || !lastName) {
+    return fail("Fill in your name, email and password.")
+  }
+
+  // Optional fields are only sent when filled in. An empty string is not the
+  // same as absent to Medusa's validators.
+  const customerForm: HttpTypes.StoreCreateCustomer = {
+    email,
+    first_name: firstName,
+    last_name: lastName,
+    ...(phone ? { phone } : {}),
   }
 
   try {
-    const token = await sdk.auth.register("customer", "emailpass", {
-      email: customerForm.email,
-      password: password,
-    })
+    let registrationToken: string | null = null
 
-    const customHeaders = { authorization: `Bearer ${token}` }
-    
-    const { customer: createdCustomer } = await sdk.store.customer.create(
-      customerForm,
-      {},
-      customHeaders
-    )
+    try {
+      registrationToken = await sdk.auth.register("customer", "emailpass", {
+        email,
+        password,
+      })
+    } catch (error: any) {
+      if (!/already exists/i.test(error?.message ?? String(error))) {
+        throw error
+      }
+    }
 
-    const loginToken = await sdk.auth.login("customer", "emailpass", {
-      email: customerForm.email,
-      password,
-    })
+    if (registrationToken) {
+      await sdk.store.customer.create(
+        customerForm,
+        {},
+        { authorization: `Bearer ${registrationToken}` }
+      )
+    } else {
+      // The identity exists already. Signing in proves the password is theirs
+      // before anything is created against it.
+      let existingToken: string | null
+      try {
+        existingToken = await emailpassLogin(email, password)
+      } catch {
+        return fail(
+          "An account with this email already exists. Sign in instead, or reset your password."
+        )
+      }
 
-    if (typeof loginToken !== "string") {
-      // emailpass always returns a token string. The other shapes in the union
-      // are OAuth redirect, MFA challenge and pending email verification, none
-      // of which this storefront implements.
-      return "Account created, but automatic sign-in is not available. Please sign in."
+      if (!existingToken) {
+        return fail("This account requires a sign-in step that is not supported here.")
+      }
+
+      const hasCustomer = await sdk.client
+        .fetch("/store/customers/me", {
+          method: "GET",
+          headers: { authorization: `Bearer ${existingToken}` },
+        })
+        .then(() => true)
+        .catch(() => false)
+
+      if (!hasCustomer) {
+        await sdk.store.customer.create(
+          customerForm,
+          {},
+          { authorization: `Bearer ${existingToken}` }
+        )
+      }
+    }
+
+    // A fresh login is required either way: the registration token, and a
+    // token issued before the customer existed, carry no customer id.
+    const loginToken = await emailpassLogin(email, password)
+
+    if (!loginToken) {
+      return fail("Account created, but automatic sign-in is not available. Please sign in.")
     }
 
     await setAuthToken(loginToken)
-
     await revalidateCacheTag("customers")
-    return createdCustomer
+    return { success: true, error: null }
   } catch (error: any) {
-    return error.toString()
+    return fail(error?.message ?? String(error))
   }
 }
 
-export async function login(_currentState: unknown, formData: FormData) {
-  const email = formData.get("email") as string
+export async function login(
+  _currentState: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const email = (formData.get("email") as string)?.trim()
   const password = formData.get("password") as string
 
   try {
-    const token = await sdk.auth.login("customer", "emailpass", {
-      email,
-      password,
-    })
+    const token = await emailpassLogin(email, password)
 
-    if (typeof token !== "string") {
-      // See the note in signup: only the string form is supported here.
-      return "This account requires a sign-in step that is not supported here."
+    if (!token) {
+      return fail("This account requires a sign-in step that is not supported here.")
     }
 
     await setAuthToken(token)
     await revalidateCacheTag("customers")
+    return { success: true, error: null }
   } catch (error: any) {
-    return error.toString()
+    return fail(error?.message ?? String(error))
   }
 }
 
