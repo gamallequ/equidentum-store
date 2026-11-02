@@ -1,4 +1,4 @@
-import { loadEnv, Modules, defineConfig } from '@medusajs/utils';
+import { loadEnv, Modules, ContainerRegistrationKeys, defineConfig } from '@medusajs/utils';
 import {
   ADMIN_CORS,
   AUTH_CORS,
@@ -50,7 +50,13 @@ const medusaConfig = {
       authCors: AUTH_CORS,
       storeCors: STORE_CORS,
       jwtSecret: JWT_SECRET,
-      cookieSecret: COOKIE_SECRET
+      cookieSecret: COOKIE_SECRET,
+      // Customers sign in with a phone number and a one-time code only, and
+      // admin users keep email and password. Enforced on the /auth routes.
+      authMethodsPerActor: {
+        user: ['emailpass'],
+        customer: ['phone-otp']
+      }
     },
     build: {
       rollupOptions: {
@@ -63,6 +69,26 @@ const medusaConfig = {
     disable: SHOULD_DISABLE_ADMIN,
   },
   modules: [
+    {
+      // Declared explicitly to add phone sign-in. Declaring the auth module
+      // replaces Medusa's default provider list, so emailpass, which admin
+      // users sign in with, has to be listed again here.
+      key: Modules.AUTH,
+      resolve: '@medusajs/medusa/auth',
+      dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
+      options: {
+        providers: [
+          {
+            resolve: '@medusajs/medusa/auth-emailpass',
+            id: 'emailpass'
+          },
+          {
+            resolve: './src/modules/phone-otp-auth',
+            id: 'phone-otp'
+          }
+        ]
+      }
+    },
     {
       key: Modules.FILE,
       resolve: '@medusajs/file',
