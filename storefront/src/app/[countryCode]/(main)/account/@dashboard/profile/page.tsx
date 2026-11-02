@@ -4,7 +4,6 @@ import ProfilePhone from "@modules/account//components/profile-phone"
 import ProfileBillingAddress from "@modules/account/components/profile-billing-address"
 import ProfileEmail from "@modules/account/components/profile-email"
 import ProfileName from "@modules/account/components/profile-name"
-import ProfilePassword from "@modules/account/components/profile-password"
 
 import { notFound } from "next/navigation"
 import { listRegions } from "@lib/data/regions"
@@ -29,9 +28,8 @@ export default async function Profile() {
       <div className="mb-8 flex flex-col gap-y-4">
         <h1 className="text-2xl-semi">Profile</h1>
         <p className="text-base-regular">
-          View and update your profile information, including your name, email,
-          and phone number. You can also update your billing address, or change
-          your password.
+          View and update your profile information, including your name and
+          email. You can also update your billing address.
         </p>
       </div>
       <div className="flex flex-col gap-y-8 w-full">
@@ -40,8 +38,6 @@ export default async function Profile() {
         <ProfileEmail customer={customer} />
         <Divider />
         <ProfilePhone customer={customer} />
-        <Divider />
-        <ProfilePassword customer={customer} />
         <Divider />
         <ProfileBillingAddress customer={customer} regions={regions} />
       </div>

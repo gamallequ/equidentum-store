@@ -186,3 +186,37 @@ export const WORKER_MODE =
  * Disable Admin
  */
 export const SHOULD_DISABLE_ADMIN = process.env.MEDUSA_DISABLE_ADMIN === 'true'
+
+/**
+ * Phone sign-in for customers (one-time code by SMS, WhatsApp as fallback).
+ *
+ * Mirrors the OTP flow in the Equidentum stable-management API: FGC SMS is
+ * the primary channel and Cartat WhatsApp the fallback, or the other way round
+ * with MESSAGING_PRIMARY_CHANNEL=whatsapp. A channel counts as configured only
+ * when its credentials are set. With neither configured, development logs the
+ * code to the console and production refuses to send.
+ */
+export const FGC_SMS_API_BASE_URL = process.env.FGC_SMS_API_BASE_URL || 'https://cnc.fgc.sa'
+export const FGC_SMS_USERNAME = process.env.FGC_SMS_USERNAME
+export const FGC_SMS_PASSWORD = process.env.FGC_SMS_PASSWORD
+export const FGC_SMS_SENDER_NAME = process.env.FGC_SMS_SENDER_NAME || 'EDentum'
+export const FGC_SMS_MESSAGE_TYPE_ID = Number(process.env.FGC_SMS_MESSAGE_TYPE_ID || 1)
+
+export const CARTAT_API_BASE_URL = process.env.CARTAT_API_BASE_URL || 'https://api.cartat.net'
+export const CARTAT_ACCESS_TOKEN = process.env.CARTAT_ACCESS_TOKEN
+
+export const MESSAGING_PRIMARY_CHANNEL: 'sms' | 'whatsapp' =
+  process.env.MESSAGING_PRIMARY_CHANNEL?.toLowerCase() === 'whatsapp' ? 'whatsapp' : 'sms'
+
+/**
+ * Secret mixed into the stored hash of each one-time code. Falls back to
+ * JWT_SECRET so a deploy that has not set it still works; set it to its own
+ * random value in production.
+ */
+export const PHONE_OTP_HASH_SECRET = process.env.PHONE_OTP_HASH_SECRET || JWT_SECRET
+warnIfWeakSecret('PHONE_OTP_HASH_SECRET', PHONE_OTP_HASH_SECRET)
+
+/**
+ * Country code assumed for local numbers like 05XXXXXXXX. Digits only.
+ */
+export const PHONE_DEFAULT_COUNTRY_CODE = (process.env.PHONE_DEFAULT_COUNTRY_CODE || '966').replace(/\D/g, '')

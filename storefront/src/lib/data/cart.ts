@@ -65,7 +65,13 @@ export async function getOrSetCart(countryCode: string) {
   }
 
   if (!cart) {
-    const cartResp = await sdk.store.cart.create({ region_id: region.id })
+    // Auth headers make a cart created while signed in belong to the customer,
+    // so it carries their id and email from the start.
+    const cartResp = await sdk.store.cart.create(
+      { region_id: region.id },
+      {},
+      await getAuthHeaders()
+    )
     cart = cartResp.cart
     await setCartId(cart.id)
     await revalidateCacheTag("carts")
@@ -83,6 +89,36 @@ export async function getOrSetCart(countryCode: string) {
   }
 
   return cart
+}
+
+/**
+ * Hands the visitor's guest cart to the customer who just signed in.
+ *
+ * Without this a cart built before signing in stayed a guest cart: no
+ * customer id, no customer email, and an order placed from it never showed up
+ * under the customer. Medusa sets both on transfer.
+ *
+ * Failures are swallowed on purpose. Signing in must not fail because of the
+ * cart, and the one expected refusal, a cart that already belongs to a
+ * different customer, is correct to leave alone.
+ */
+export async function transferCart(token?: string) {
+  const cartId = await getCartId()
+
+  if (!cartId) {
+    return
+  }
+
+  // Sign-in passes its fresh token: the cookie it has just set is not
+  // guaranteed to be readable again within the same request.
+  const headers = token
+    ? { authorization: `Bearer ${token}` }
+    : await getAuthHeaders()
+
+  await sdk.store.cart
+    .transferCart(cartId, {}, headers)
+    .then(() => revalidateCacheTag("carts"))
+    .catch(() => {})
 }
 
 export async function updateCart(data: HttpTypes.StoreUpdateCart) {

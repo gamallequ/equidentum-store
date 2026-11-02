@@ -62,15 +62,41 @@ const ShippingAddress = ({
   }
 
   useEffect(() => {
-    // Ensure cart is not null and has a shipping_address before setting form data
-    if (cart && cart.shipping_address) {
-      setFormAddress(cart?.shipping_address, cart?.email)
+    if (!cart) {
+      return
     }
 
-    if (cart && !cart.email && customer?.email) {
+    // An address already on the cart is what the shopper last entered, so it
+    // always wins over anything from the profile.
+    if (cart.shipping_address) {
+      setFormAddress(cart.shipping_address, cart.email)
+    } else if (customer) {
+      // Otherwise start from the profile: the default shipping address, or
+      // the only saved address in this region, else just the name and phone
+      // given at signup. Without this a signed-in customer faced a blank form.
+      const savedAddress =
+        addressesInRegion?.find((a) => a.is_default_shipping) ||
+        (addressesInRegion?.length === 1 ? addressesInRegion[0] : undefined)
+
+      if (savedAddress) {
+        setFormAddress(savedAddress as HttpTypes.StoreCartAddress)
+      } else {
+        setFormData((prevState: Record<string, any>) => ({
+          ...prevState,
+          "shipping_address.first_name":
+            prevState["shipping_address.first_name"] || customer.first_name || "",
+          "shipping_address.last_name":
+            prevState["shipping_address.last_name"] || customer.last_name || "",
+          "shipping_address.phone":
+            prevState["shipping_address.phone"] || customer.phone || "",
+        }))
+      }
+    }
+
+    if (!cart.email && customer?.email) {
       setFormAddress(undefined, customer.email)
     }
-  }, [cart]) // Add cart as a dependency
+  }, [cart, customer, addressesInRegion])
 
   const handleChange = (
     e: React.ChangeEvent<
