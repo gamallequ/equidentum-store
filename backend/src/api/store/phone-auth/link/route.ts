@@ -38,8 +38,9 @@ function storedPhoneVariants(e164: string): string[] {
  *
  * Responds { linked: true } after attaching a customer; the caller must
  * refresh its token to get one with the customer id. Responds
- * { linked: false } when no single registered customer has the number, and
- * the storefront then asks for name and email instead. When two or more
+ * { linked: false, phone } when no single registered customer has the
+ * number, and the storefront then asks for name and email instead. `phone` is
+ * the normalized number, to be saved on the customer it creates. When two or more
  * accounts share the number, none is chosen.
  */
 export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse) {
@@ -80,7 +81,9 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
   })
 
   if (candidates.length !== 1) {
-    return res.json({ linked: false })
+    // The normalized number goes back so the storefront saves the new
+    // customer's phone in the same form the sign-in uses.
+    return res.json({ linked: false, phone })
   }
 
   await authModule.updateAuthIdentities({

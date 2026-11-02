@@ -136,6 +136,37 @@ export const removeAuthToken = async () => {
   })
 }
 
+/**
+ * Token from a verified phone code that has no customer yet, held while the
+ * shopper fills in name and email.
+ *
+ * Kept apart from _medusa_jwt on purpose. A token without a customer is only
+ * good for creating one, and every request that reads _medusa_jwt (carts,
+ * /customers/me) would treat it as a signed-in session. Fifteen minutes is
+ * plenty to type two fields.
+ */
+const PENDING_AUTH_COOKIE = "_medusa_pending_jwt"
+
+export const getPendingAuthToken = async (): Promise<string | undefined> => {
+  const cookiesStore = await cookies()
+  return cookiesStore.get(PENDING_AUTH_COOKIE)?.value || undefined
+}
+
+export const setPendingAuthToken = async (token: string) => {
+  const cookiesStore = await cookies()
+  cookiesStore.set(PENDING_AUTH_COOKIE, token, {
+    maxAge: 60 * 15,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  })
+}
+
+export const removePendingAuthToken = async () => {
+  const cookiesStore = await cookies()
+  cookiesStore.set(PENDING_AUTH_COOKIE, "", { maxAge: -1 })
+}
+
 export const getCartId = async () => {
   const cookiesStore = await cookies()
   return cookiesStore.get("_medusa_cart_id")?.value
