@@ -88,8 +88,8 @@ export async function seedDiscount(axios?: AxiosInstance) {
 
 async function loginAdmin() {
   const resp = await axios.post("/admin/auth/token", {
-    email: process.env.MEDUSA_ADMIN_EMAIL || "admin@medusa-test.com",
-    password: process.env.MEDUSA_ADMIN_PASSWORD || "supersecret",
+    email: process.env.EQUIDENTUM_ADMIN_EMAIL || process.env.MEDUSA_ADMIN_EMAIL || "admin@equidentum-test.com",
+    password: process.env.EQUIDENTUM_ADMIN_PASSWORD || process.env.MEDUSA_ADMIN_PASSWORD || "supersecret",
   })
   if (resp.status !== 200) {
     throw { error: "must be able to log in user" }

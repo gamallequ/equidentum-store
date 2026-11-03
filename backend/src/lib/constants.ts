@@ -100,12 +100,16 @@ export const COOKIE_SECRET = assertValue(
 
 // Fires at boot, from medusa-config.js, and only in production. See
 // warnIfWeakSecret for why this warns rather than refusing to start.
-// MEDUSA_ADMIN_PASSWORD is checked here too even though this backend never
-// reads it: medusajs-launch-utils uses it to create the first admin user, so
-// leaving it on the placeholder is a dashboard takeover on a public URL.
+// EQUIDENTUM_ADMIN_PASSWORD is checked here too even though this backend never
+// reads it: src/scripts/init-backend.js uses it to create the first admin user,
+// so leaving it on the placeholder is a dashboard takeover on a public URL.
+// MEDUSA_ADMIN_PASSWORD is the name older deploys used, and still works.
 warnIfWeakSecret('JWT_SECRET', JWT_SECRET)
 warnIfWeakSecret('COOKIE_SECRET', COOKIE_SECRET)
-warnIfWeakSecret('MEDUSA_ADMIN_PASSWORD', process.env.MEDUSA_ADMIN_PASSWORD)
+warnIfWeakSecret(
+  'EQUIDENTUM_ADMIN_PASSWORD',
+  process.env.EQUIDENTUM_ADMIN_PASSWORD || process.env.MEDUSA_ADMIN_PASSWORD
+)
 
 /**
  * (optional) S3-compatible file storage configuration.
@@ -177,15 +181,20 @@ export const MEILISEARCH_HOST = process.env.MEILISEARCH_HOST;
 export const MEILISEARCH_ADMIN_KEY = process.env.MEILISEARCH_ADMIN_KEY;
 
 /**
- * Worker mode
+ * Worker mode. MEDUSA_WORKER_MODE is the name older deploys used, and still works.
  */
 export const WORKER_MODE =
-  (process.env.MEDUSA_WORKER_MODE as 'worker' | 'server' | 'shared' | undefined) ?? 'shared'
+  ((process.env.EQUIDENTUM_WORKER_MODE || process.env.MEDUSA_WORKER_MODE) as
+    | 'worker'
+    | 'server'
+    | 'shared'
+    | undefined) ?? 'shared'
 
 /**
- * Disable Admin
+ * Disable Admin. MEDUSA_DISABLE_ADMIN is the name older deploys used, and still works.
  */
-export const SHOULD_DISABLE_ADMIN = process.env.MEDUSA_DISABLE_ADMIN === 'true'
+export const SHOULD_DISABLE_ADMIN =
+  (process.env.EQUIDENTUM_DISABLE_ADMIN ?? process.env.MEDUSA_DISABLE_ADMIN) === 'true'
 
 /**
  * Phone sign-in for customers (one-time code by SMS, WhatsApp as fallback).

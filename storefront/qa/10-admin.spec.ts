@@ -2,9 +2,9 @@ import { test, expect, Page } from "@playwright/test"
 import { qaEnv } from "./helpers"
 
 /**
- * The Medusa admin dashboard the backend serves at /app.
+ * The admin dashboard the backend serves at /app.
  *
- * Credentials come from MEDUSA_ADMIN_EMAIL / MEDUSA_ADMIN_PASSWORD, the same
+ * Credentials come from EQUIDENTUM_ADMIN_EMAIL / EQUIDENTUM_ADMIN_PASSWORD, the same
  * pair `pnpm ib` uses to create the first user. These tests only read; nothing
  * here mutates store data.
  */
