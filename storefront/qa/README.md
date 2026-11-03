@@ -56,7 +56,7 @@ so CI can override without editing files.
 | `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | Backend, also used to reach the admin at `/app`. |
 | `NEXT_PUBLIC_STORE_NAME` | Asserted in the nav, footer and titles. |
 | `NEXT_PUBLIC_DEFAULT_REGION` | Country prefix every route is tested under. |
-| `MEDUSA_ADMIN_EMAIL` / `MEDUSA_ADMIN_PASSWORD` | Admin dashboard sign-in. |
+| `EQUIDENTUM_ADMIN_EMAIL` / `EQUIDENTUM_ADMIN_PASSWORD` | Admin dashboard sign-in. |
 | `NEXT_PUBLIC_STRIPE_KEY` | Presence alone decides whether checkout is expected to show a card form. |
 | `STRIPE_API_KEY` | Optional. Lets `13-payment` confirm the charge with Stripe instead of trusting the confirmation page. |
 | `RESEND_API_KEY` | Optional. Lets `14-email` and `15-password-reset` read the sent message back from Resend. Both skip without it. |

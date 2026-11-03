@@ -48,7 +48,7 @@ confirmed it against the live store or only read the code.
 
 1. **`JWT_SECRET` and `COOKIE_SECRET`.** They sign admin sessions. Generate one with
    `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
-2. **`MEDUSA_ADMIN_PASSWORD`.** Change it before the first boot, or change the
+2. **`EQUIDENTUM_ADMIN_PASSWORD`.** Change it before the first boot, or change the
    password in the dashboard afterwards.
 
 Anything copied from `.env.template` and left unchanged should be treated as public.

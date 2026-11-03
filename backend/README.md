@@ -88,7 +88,7 @@ published in this repository:
 
 - `JWT_SECRET` and `COOKIE_SECRET` sign admin sessions. The backend prints a
   warning at boot when a production deploy is still on the placeholder.
-- `MEDUSA_ADMIN_PASSWORD` is the login to your own dashboard.
+- `EQUIDENTUM_ADMIN_PASSWORD` is the login to your own dashboard.
 
 Email needs both halves of one provider: `RESEND_API_KEY` **and**
 `RESEND_FROM_EMAIL` (or the SendGrid pair). With only one set, the notification

@@ -50,10 +50,10 @@ export const qaEnv = {
   storeName: read("NEXT_PUBLIC_STORE_NAME", "Equidentum"),
   /** Must match a country covered by a region in Medusa. */
   region: read("NEXT_PUBLIC_DEFAULT_REGION", "gb").toLowerCase(),
-  /** Medusa admin dashboard, served by the backend at /app. */
+  /** Admin dashboard, served by the backend at /app. */
   adminURL: `${read("NEXT_PUBLIC_MEDUSA_BACKEND_URL", "http://localhost:9000")}/app`,
-  adminEmail: read("MEDUSA_ADMIN_EMAIL", "admin@yourmail.com"),
-  adminPassword: read("MEDUSA_ADMIN_PASSWORD", "supersecret"),
+  adminEmail: read("EQUIDENTUM_ADMIN_EMAIL", read("MEDUSA_ADMIN_EMAIL", "admin@yourmail.com")),
+  adminPassword: read("EQUIDENTUM_ADMIN_PASSWORD", read("MEDUSA_ADMIN_PASSWORD", "supersecret")),
   /** Mirrors isSearchEnabled() in src/lib/util/env.ts: on unless opted out. */
   searchEnabled: read("NEXT_PUBLIC_FEATURE_SEARCH_DISABLED", "") !== "true",
   stripeConfigured: Boolean(read("NEXT_PUBLIC_STRIPE_KEY", "")),

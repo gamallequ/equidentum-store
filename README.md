@@ -82,7 +82,7 @@ Environment variables are documented in:
 - `backend/.env.template`
 - `storefront/.env.local.template`
 
-Before any production deploy, change `JWT_SECRET`, `COOKIE_SECRET` and `MEDUSA_ADMIN_PASSWORD` from their placeholder values.
+Before any production deploy, change `JWT_SECRET`, `COOKIE_SECRET` and `EQUIDENTUM_ADMIN_PASSWORD` from their placeholder values.
 
 ## Deployment
 
