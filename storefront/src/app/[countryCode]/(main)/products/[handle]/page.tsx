@@ -2,48 +2,25 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import ProductTemplate from "@modules/products/templates"
-import { getRegion, listRegions } from "@lib/data/regions"
-import { getProductByHandle, getProductsList } from "@lib/data/products"
+import { getRegion } from "@lib/data/regions"
+import { getProductByHandle } from "@lib/data/products"
 import { getStoreName } from "@lib/util/env"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
 }
 
-export async function generateStaticParams() {
-  const countryCodes = await listRegions().then(
-    (regions) =>
-      regions
-        ?.map((r) => r.countries?.map((c) => c.iso_2))
-        .flat()
-        .filter(Boolean) as string[]
-  )
-
-  // generateStaticParams must return an array; returning null makes the build
-  // fail rather than fall back to on-demand rendering.
-  if (!countryCodes) {
-    return []
-  }
-
-  const products = await Promise.all(
-    countryCodes.map((countryCode) => {
-      return getProductsList({ countryCode })
-    })
-  ).then((responses) =>
-    responses.map(({ response }) => response.products).flat()
-  )
-
-  const staticParams = countryCodes
-    ?.map((countryCode) =>
-      products.map((product) => ({
-        countryCode,
-        handle: product.handle,
-      }))
-    )
-    .flat()
-
-  return staticParams
-}
+/**
+ * Rendered on request rather than prerendered at build time. Prerendering
+ * fetched every page from the backend during `next build`, so the storefront
+ * deploy failed whenever the backend was briefly unreachable, as it is while
+ * it redeploys from the same push. The catalog fetches are still cached
+ * (force-cache with tags), so a page costs a backend call only on its first
+ * visit or after the catalog changes. `dynamic` replaces generateStaticParams,
+ * which it is ignored alongside; see the collections page for why an empty
+ * generateStaticParams is not an option.
+ */
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle, countryCode } = await params
