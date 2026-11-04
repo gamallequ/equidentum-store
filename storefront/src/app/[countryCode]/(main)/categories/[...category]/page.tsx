@@ -1,9 +1,8 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-import { getCategoryByHandle, listCategories } from "@lib/data/categories"
-import { listRegions } from "@lib/data/regions"
-import { StoreProductCategory, StoreRegion } from "@medusajs/types"
+import { getCategoryByHandle } from "@lib/data/categories"
+import { StoreProductCategory } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getStoreName } from "@lib/util/env"
@@ -16,32 +15,17 @@ type Props = {
   }>
 }
 
-export async function generateStaticParams() {
-  const product_categories = await listCategories()
-
-  if (!product_categories) {
-    return []
-  }
-
-  const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
-    regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
-  )
-
-  const categoryHandles = product_categories.map(
-    (category: any) => category.handle
-  )
-
-  const staticParams = countryCodes
-    ?.map((countryCode: string | undefined) =>
-      categoryHandles.map((handle: any) => ({
-        countryCode,
-        category: [handle],
-      }))
-    )
-    .flat()
-
-  return staticParams
-}
+/**
+ * Rendered on request rather than prerendered at build time. Prerendering
+ * fetched every page from the backend during `next build`, so the storefront
+ * deploy failed whenever the backend was briefly unreachable, as it is while
+ * it redeploys from the same push. The catalog fetches are still cached
+ * (force-cache with tags), so a page costs a backend call only on its first
+ * visit or after the catalog changes. `dynamic` replaces generateStaticParams,
+ * which it is ignored alongside; see the collections page for why an empty
+ * generateStaticParams is not an option.
+ */
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params
