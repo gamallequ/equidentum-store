@@ -1,6 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import compareAddresses from "@lib/util/compare-addresses"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { omit } from "lodash"
@@ -389,6 +390,43 @@ export async function submitPromotionForm(
   }
 }
 
+/**
+ * Adds the checkout shipping address to the signed-in customer's saved
+ * addresses, unless one already matches, so next time they can pick it from
+ * the list at checkout instead of typing it again. Guests are skipped.
+ * Failures are only logged: checkout must not stop because of this.
+ */
+async function saveAddressToAccount(address: Record<string, any>) {
+  const headers = await getAuthHeaders()
+  if (!("authorization" in headers)) return
+
+  try {
+    const { customer } = await sdk.client.fetch<HttpTypes.StoreCustomerResponse>(
+      "/store/customers/me",
+      { method: "GET", headers, query: { fields: "*addresses" } }
+    )
+
+    if (customer.addresses?.some((a) => compareAddresses(a, address))) return
+
+    await sdk.store.customer.createAddress(
+      {
+        first_name: address.first_name || undefined,
+        address_1: address.address_1 || undefined,
+        city: address.city || undefined,
+        country_code: address.country_code || undefined,
+        province: address.province || undefined,
+        phone: address.phone || undefined,
+        is_default_shipping: !customer.addresses?.length,
+      },
+      {},
+      headers
+    )
+    await revalidateCacheTag("customers")
+  } catch (error) {
+    console.error("Could not save the checkout address to the account", error)
+  }
+}
+
 // TODO: Pass a POJO instead of a form entity here
 export async function setAddresses(currentState: unknown, formData: FormData) {
   try {
@@ -400,39 +438,28 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       throw new Error("No existing cart found when setting addresses")
     }
 
-    const data = {
-      shipping_address: {
-        first_name: formData.get("shipping_address.first_name"),
-        last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
-        address_2: "",
-        company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
-        country_code: formData.get("shipping_address.country_code"),
-        province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
-      },
-      email: formData.get("email"),
-    } as any
+    // Only name, address, city, country, province and phone are collected.
+    // Email is left out so the cart keeps the one it already has: a
+    // signed-in customer's cart carries their email, a guest cart has none.
+    const addressFrom = (prefix: "shipping_address" | "billing_address") => ({
+      first_name: formData.get(`${prefix}.first_name`),
+      address_1: formData.get(`${prefix}.address_1`),
+      city: formData.get(`${prefix}.city`),
+      country_code: formData.get(`${prefix}.country_code`),
+      province: formData.get(`${prefix}.province`),
+      phone: formData.get(`${prefix}.phone`),
+    })
+
+    const data = { shipping_address: addressFrom("shipping_address") } as any
 
     const sameAsBilling = formData.get("same_as_billing")
-    if (sameAsBilling === "on") data.billing_address = data.shipping_address
+    data.billing_address =
+      sameAsBilling === "on"
+        ? data.shipping_address
+        : addressFrom("billing_address")
 
-    if (sameAsBilling !== "on")
-      data.billing_address = {
-        first_name: formData.get("billing_address.first_name"),
-        last_name: formData.get("billing_address.last_name"),
-        address_1: formData.get("billing_address.address_1"),
-        address_2: "",
-        company: formData.get("billing_address.company"),
-        postal_code: formData.get("billing_address.postal_code"),
-        city: formData.get("billing_address.city"),
-        country_code: formData.get("billing_address.country_code"),
-        province: formData.get("billing_address.province"),
-        phone: formData.get("billing_address.phone"),
-      }
     await updateCart(data)
+    await saveAddressToAccount(data.shipping_address)
   } catch (e: any) {
     return e.message
   }

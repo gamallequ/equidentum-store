@@ -24,7 +24,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart ||
     !cart.shipping_address ||
     !cart.billing_address ||
-    !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
   // TODO: Add this once gift cards are implemented
@@ -128,9 +127,9 @@ const StripePaymentButton = ({
           card: card,
           billing_details: {
             name:
-              cart.billing_address?.first_name +
-              " " +
-              cart.billing_address?.last_name,
+              [cart.billing_address?.first_name, cart.billing_address?.last_name]
+                .filter(Boolean)
+                .join(" ") || undefined,
             address: {
               city: cart.billing_address?.city ?? undefined,
               country: cart.billing_address?.country_code ?? undefined,
@@ -139,7 +138,7 @@ const StripePaymentButton = ({
               postal_code: cart.billing_address?.postal_code ?? undefined,
               state: cart.billing_address?.province ?? undefined,
             },
-            email: cart.email,
+            email: cart.email || undefined,
             phone: cart.billing_address?.phone ?? undefined,
           },
         },

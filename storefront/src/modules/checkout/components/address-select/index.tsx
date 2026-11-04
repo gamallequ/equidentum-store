@@ -81,11 +81,11 @@ const AddressSelect = ({
                     />
                     <div className="flex flex-col">
                       <span className="text-left text-base-semi">
-                        {address.first_name} {address.last_name}
+                        {address.first_name}
                       </span>
-                      {address.company && (
+                      {address.phone && (
                         <span className="text-small-regular text-ui-fg-base">
-                          {address.company}
+                          {address.phone}
                         </span>
                       )}
                       <div className="flex flex-col text-left text-base-regular mt-2">
@@ -96,7 +96,7 @@ const AddressSelect = ({
                           )}
                         </span>
                         <span>
-                          {address.postal_code}, {address.city}
+                          {address.city}
                         </span>
                         <span>
                           {address.province && `${address.province}, `}
