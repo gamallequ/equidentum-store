@@ -15,16 +15,20 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
 
   return (
     <div>
-      <Text>
-        We have sent the order confirmation details to{" "}
-        <span
-          className="text-ui-fg-medium-plus font-semibold"
-          data-testid="order-email"
-        >
-          {order.email}
-        </span>
-        .
-      </Text>
+      {/* Checkout no longer asks for an email, so a guest order has only the
+          phone the order text went to. */}
+      {(order.email || order.shipping_address?.phone) && (
+        <Text>
+          We have sent the order confirmation details to{" "}
+          <span
+            className="text-ui-fg-medium-plus font-semibold"
+            data-testid="order-email"
+          >
+            {order.email || order.shipping_address?.phone}
+          </span>
+          .
+        </Text>
+      )}
       <Text className="mt-2">
         Order date:{" "}
         <span data-testid="order-date">

@@ -400,38 +400,26 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       throw new Error("No existing cart found when setting addresses")
     }
 
-    const data = {
-      shipping_address: {
-        first_name: formData.get("shipping_address.first_name"),
-        last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
-        address_2: "",
-        company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
-        country_code: formData.get("shipping_address.country_code"),
-        province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
-      },
-      email: formData.get("email"),
-    } as any
+    // Only name, address, city, country, province and phone are collected.
+    // Email is left out so the cart keeps the one it already has: a
+    // signed-in customer's cart carries their email, a guest cart has none.
+    const addressFrom = (prefix: "shipping_address" | "billing_address") => ({
+      first_name: formData.get(`${prefix}.first_name`),
+      address_1: formData.get(`${prefix}.address_1`),
+      city: formData.get(`${prefix}.city`),
+      country_code: formData.get(`${prefix}.country_code`),
+      province: formData.get(`${prefix}.province`),
+      phone: formData.get(`${prefix}.phone`),
+    })
+
+    const data = { shipping_address: addressFrom("shipping_address") } as any
 
     const sameAsBilling = formData.get("same_as_billing")
-    if (sameAsBilling === "on") data.billing_address = data.shipping_address
+    data.billing_address =
+      sameAsBilling === "on"
+        ? data.shipping_address
+        : addressFrom("billing_address")
 
-    if (sameAsBilling !== "on")
-      data.billing_address = {
-        first_name: formData.get("billing_address.first_name"),
-        last_name: formData.get("billing_address.last_name"),
-        address_1: formData.get("billing_address.address_1"),
-        address_2: "",
-        company: formData.get("billing_address.company"),
-        postal_code: formData.get("billing_address.postal_code"),
-        city: formData.get("billing_address.city"),
-        country_code: formData.get("billing_address.country_code"),
-        province: formData.get("billing_address.province"),
-        phone: formData.get("billing_address.phone"),
-      }
     await updateCart(data)
   } catch (e: any) {
     return e.message
